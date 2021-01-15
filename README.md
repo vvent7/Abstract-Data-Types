@@ -1,2 +1,2 @@
-# ADTs
-ADTs in C
+# Abstract-Data-Types
+Abstract-Data-Types in C
