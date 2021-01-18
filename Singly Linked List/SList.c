@@ -9,7 +9,7 @@ SNode* SN_Create(void *data, SNode *next){
   return node;
 }
 
-void SN_Free(SNode *node, bool freeData, bool freeNext){
+void SN_Free(SNode *node, void (*freeData)(void *data), bool freeNext){
   if(node==NULL) return;
   
   if(freeData) free(node->data);
@@ -23,13 +23,13 @@ SList* SL_Create(){
   return ls;
 }
 
-void SL_Clear(SList *ls, bool freeData){
+void SL_Clear(SList *ls, void (*freeData)(void *data)){
   if(ls==NULL) return;
   SN_Free(ls->begin, freeData, true);
   ls->begin = ls->end = NULL; ls->size = 0;
 }
 
-void SL_Free(SList *ls, bool freeData){
+void SL_Free(SList *ls, void (*freeData)(void *data)){
   if(ls==NULL) return;
   SL_Clear(ls, freeData);
   free(ls);
@@ -75,7 +75,7 @@ bool SL_InsertIndex(SList *ls, void *data, int index){
   return true;
 }
 
-bool SListInsertBegin(SList *ls, void *data){
+bool SL_InsertBegin(SList *ls, void *data){
   return ls==NULL ? false : SL_InsertIndex(ls, data, 0);
 }
 
@@ -83,17 +83,15 @@ bool SL_InsertEnd(SList *ls, void *data){
   return ls==NULL ? false : SL_InsertIndex(ls, data, ls->size);
 }
 
-bool SL_DeleteIndex(SList *ls, int index, bool freeData){
+bool SL_DeleteIndex(SList *ls, int index, void (*freeData)(void *data)){
   if(ls==NULL || SL_IsEmpty(ls) || index<0 || index>=ls->size) return false;
-
-  ls->size--;
 
   SNode *node;
   
   if(index==0){
     node = ls->begin;
     ls->begin = ls->begin->next;
-    if(SL_IsEmpty(ls)) ls->end = NULL;
+    if(ls->size==1) ls->end = NULL;
   }
   else{
     SNode *aux = SL_GetPreNode(ls, index);
@@ -106,17 +104,18 @@ bool SL_DeleteIndex(SList *ls, int index, bool freeData){
 
   SN_Free(node, freeData, false);
 
+  ls->size--;
+
   return true;
 }
 
-bool SL_DeleteBegin(SList *ls, bool freeData){
+bool SL_DeleteBegin(SList *ls, void (*freeData)(void *data)){
   return ls==NULL ? false : SL_DeleteIndex(ls, 0, freeData);
 }
 
-bool SL_DeleteEnd(SList *ls, bool freeData){
-  return ls==NULL ? false : SL_DeleteIndex(ls, ls->size, freeData);
+bool SL_DeleteEnd(SList *ls, void (*freeData)(void *data)){
+  return ls==NULL ? false : SL_DeleteIndex(ls, ls->size-1, freeData);
 }
-
 
 void SL_Print(SList *ls, void (*printData)(void *data), char *sep){
   if(ls==NULL || printData==NULL) return;
