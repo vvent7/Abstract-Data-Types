@@ -23,19 +23,19 @@ typedef struct{
 SNode* SN_Create(void *data, SNode *next);
 
 /* Free SNode.
-  freeData: Function to free data. Case NULL -> don't free SNode's data
-  delNext: true->free next SNodes, false->don't free next SNodes */
+  freeData: Function to free data. Case NULL -> doesn't free SNode's data
+  delNext: true->free next SNodes, false->doesn't free next SNodes */
 void SN_Free(SNode *node, void (*freeData)(void *data), bool freeNext);
 
 //Create new SList
 SList* SL_Create();
 
 /*Clear entire SList (remove SList's SNodes from memory)
-  freeData: Function to free data. Case NULL -> don't free SNode's data*/
+  freeData: Function to free data. Case NULL -> doesn't free SNode's data*/
 void SL_Clear(SList *ls, void (*freeData)(void *data));
 
 /*Free entire SList (remove SList and its SNodes from memory)
-  freeData: Function to free data. Case NULL -> don't free SNode's data*/
+  freeData: Function to free data. Case NULL -> doesn't free SNode's data*/
 void SL_Free(SList *ls, void (*freeData)(void *data));
 
 //Verify whether the list is empty
@@ -57,15 +57,15 @@ bool SL_InsertBegin(SList *ls, void *data);
 bool SL_InsertEnd(SList *ls, void *data);
 
 /*Delete node at specific SList's index
-  freeData: Function to free data. Case NULL -> don't free SNode's data*/
+  freeData: Function to free data. Case NULL -> doesn't free SNode's data*/
 bool SL_DeleteIndex(SList *ls, int index, void (*freeData)(void *data));
 
 /*Delete node at SList's begin
-  freeData: Function to free data. Case NULL -> don't free SNode's data*/
+  freeData: Function to free data. Case NULL -> doesn't free SNode's data*/
 bool SL_DeleteBegin(SList *ls, void (*freeData)(void *data));
 
 /*Delete node at SList's end
-  freeData: Function to free data. Case NULL -> don't free SNode's data*/
+  freeData: Function to free data. Case NULL -> doesn't free SNode's data*/
 bool SL_DeleteEnd(SList *ls, void (*freeData)(void *data));
 
 /*Print entire SList

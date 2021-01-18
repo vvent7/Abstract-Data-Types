@@ -36,7 +36,7 @@ void SL_Free(SList *ls, void (*freeData)(void *data)){
 }
 
 bool SL_IsEmpty(SList *ls){
-  return ls==NULL ? false : ls->size==0;
+  return (ls==NULL || ls->size==0);
 }
 
 SNode* SL_GetPreNode(SList *ls, int index){
@@ -84,7 +84,7 @@ bool SL_InsertEnd(SList *ls, void *data){
 }
 
 bool SL_DeleteIndex(SList *ls, int index, void (*freeData)(void *data)){
-  if(ls==NULL || SL_IsEmpty(ls) || index<0 || index>=ls->size) return false;
+  if(SL_IsEmpty(ls) || index<0 || index>=ls->size) return false;
 
   SNode *node;
   
@@ -110,16 +110,16 @@ bool SL_DeleteIndex(SList *ls, int index, void (*freeData)(void *data)){
 }
 
 bool SL_DeleteBegin(SList *ls, void (*freeData)(void *data)){
-  return ls==NULL ? false : SL_DeleteIndex(ls, 0, freeData);
+  return SL_IsEmpty(ls) ? false : SL_DeleteIndex(ls, 0, freeData);
 }
 
 bool SL_DeleteEnd(SList *ls, void (*freeData)(void *data)){
-  return ls==NULL ? false : SL_DeleteIndex(ls, ls->size-1, freeData);
+  return SL_IsEmpty(ls) ? false : SL_DeleteIndex(ls, ls->size-1, freeData);
 }
 
 void SL_Print(SList *ls, void (*printData)(void *data), char *sep){
   if(ls==NULL || printData==NULL) return;
-  if(ls->size==0){
+  if(SL_IsEmpty(ls)){
     printf("Lista vazia"); return;
   }
 
