@@ -12,7 +12,7 @@ SNode* SN_Create(void *data, SNode *next){
 void SN_Free(SNode *node, void (*freeData)(void *data), bool freeNext){
   if(node==NULL) return;
   
-  if(freeData) free(node->data);
+  if(freeData) freeData(node->data);
   if(freeNext) SN_Free(node->next, freeData, freeNext);
   free(node);
 }
@@ -120,7 +120,7 @@ bool SL_DeleteEnd(SList *ls, void (*freeData)(void *data)){
 void SL_Print(SList *ls, void (*printData)(void *data), char *sep){
   if(ls==NULL || printData==NULL) return;
   if(SL_IsEmpty(ls)){
-    printf("Lista vazia"); return;
+    printf("Empty List"); return;
   }
 
   SNode *node;

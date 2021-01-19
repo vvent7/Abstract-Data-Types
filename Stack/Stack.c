@@ -1,6 +1,6 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
 #include "Stack.h"
 
 StNode* StN_Create(void *data, StNode *next){
@@ -12,14 +12,14 @@ StNode* StN_Create(void *data, StNode *next){
 void StN_Free(StNode *node, void (*freeData)(void *data), bool freeNext){
   if(node==NULL) return;
   
-  if(freeData) free(node->data);
+  if(freeData) freeData(node->data);
   if(freeNext) StN_Free(node->next, freeData, freeNext);
   free(node);
 }
 
 Stack* St_Create(){
   Stack *st = (Stack*) malloc(sizeof(Stack));
-  st->size = 0; st->top = NULL;
+  st->top = NULL; st->size = 0;
   return st;
 }
 
@@ -65,7 +65,7 @@ void* St_Pop(Stack *st, void (*freeData)(void *data)){
 void St_Print(Stack *st, void (*printData)(void *data), char *sep){
   if(st==NULL || printData==NULL) return;
   if(st->size==0){
-    printf("Pilha vazia"); return;
+    printf("Empty Stack"); return;
   }
 
   StNode *node;
