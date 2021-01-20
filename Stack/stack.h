@@ -20,42 +20,42 @@ typedef struct{
 } Stack;
 
 //Create new StNode
-StNode* StN_Create(void *data, StNode *next);
+StNode* stn_new(void *data, StNode *next);
 
 /* Free StNode.
   freeData: Function to free data. Case NULL -> doesn't free StNode's data
   delNext: (true/false) -> (frees/doesn't free) the next StNode*/
-void StN_Free(StNode *node, void (*freeData)(void *data), bool freeNext);
+void stn_free(StNode *node, void (*freeData)(void *data), bool freeNext);
 
 //Create new Stack
-Stack* St_Create();
+Stack* st_new();
 
 /*Clear entire Stack (remove Stack's StNodes from memory)
   freeData: Function to free data. Case NULL -> doesn't free StNode's data*/
-void St_Clear(Stack *st, void (*freeData)(void *data));
+void st_clear(Stack *st, void (*freeData)(void *data));
 
 /*Free entire Stack (remove Stack and its StNodes from memory)
   freeData: Function to free data. Case NULL -> doesn't free StNode's data*/
-void St_Free(Stack *st, void (*freeData)(void *data));
+void st_free(Stack *st, void (*freeData)(void *data));
 
 //Verify whether the Stack is empty
-bool St_IsEmpty(Stack *st);
+bool st_is_empty(Stack *st);
 
 //Returns the element on Stack top
-void* St_Top(Stack *st);
+void* st_top(Stack *st);
 
 //Push data on Stack top
-void St_Push(Stack *st, void *data);
+void st_push(Stack *st, void *data);
 
 /*Remove the data on Stack top
   freeData: Function to free data.
     - Case not NULL -> free StNode's data and returns NULL
     - Case NULL -> doesn't free StNode's data and returns the data*/
-void* St_Pop(Stack *st, void (*freeData)(void *data));
+void* st_pop(Stack *st, void (*freeData)(void *data));
 
 /*Print entire Stack
   printData -> function to print Stack's data
   sep -> Separator between Stack's data */
-void St_Print(Stack *st, void (*printData)(void *data), char *sep);
+void st_print(Stack *st, void (*printData)(void *data), char *sep);
 
 #endif

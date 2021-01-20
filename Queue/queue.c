@@ -1,59 +1,59 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include "Queue.h"
+#include "queue.h"
 
-QNode* QN_Create(void *data, QNode *next){
+QNode* qn_new(void *data, QNode *next){
   QNode *node = (QNode*) malloc(sizeof(QNode));
   node->data = data; node->next = next;
   return node;
 }
 
-void QN_Free(QNode *node, void (*freeData)(void *data), bool freeNext){
+void qn_free(QNode *node, void (*freeData)(void *data), bool freeNext){
   if(node==NULL) return;
   
   if(freeData) freeData(node->data);
-  if(freeNext) QN_Free(node->next, freeData, freeNext);
+  if(freeNext) qn_free(node->next, freeData, freeNext);
   free(node);
 }
 
-Queue* Q_Create(){
+Queue* q_new(){
   Queue *q = (Queue*) malloc(sizeof(Queue));
   q->front = q->back = NULL; q->size = 0;
   return q;
 }
 
-void Q_Clear(Queue *q, void (*freeData)(void *data)){
+void q_clear(Queue *q, void (*freeData)(void *data)){
   if(q==NULL) return;
-  QN_Free(q->front, freeData, true);
+  qn_free(q->front, freeData, true);
   q->front = q->back = NULL; q->size = 0;
 }
 
-void Q_Free(Queue *q, void (*freeData)(void *data)){
+void q_free(Queue *q, void (*freeData)(void *data)){
   if(q==NULL) return;
-  Q_Clear(q, freeData);
+  q_clear(q, freeData);
   free(q);
 }
 
-bool Q_IsEmpty(Queue *q){
+bool q_is_empty(Queue *q){
   return (q==NULL || q->size==0);
 }
 
-void* Q_Front(Queue *q){
-  return Q_IsEmpty(q) ? NULL : q->front->data;
+void* q_front(Queue *q){
+  return q_is_empty(q) ? NULL : q->front->data;
 }
 
-void* Q_Back(Queue *q){
-  return Q_IsEmpty(q) ? NULL : q->back->data;
+void* q_back(Queue *q){
+  return q_is_empty(q) ? NULL : q->back->data;
 }
 
 //Pushes data in the Queue
-void Q_Push(Queue *q, void *data){
+void q_push(Queue *q, void *data){
   if(q==NULL) return;
 
-  QNode *node = QN_Create(data, NULL);
+  QNode *node = qn_new(data, NULL);
 
-  if(Q_IsEmpty(q))
+  if(q_is_empty(q))
     q->front = q->back = node;
   else{
     q->back->next = node;
@@ -67,8 +67,8 @@ void Q_Push(Queue *q, void *data){
   freeData: Function to free data.
     - Case not NULL -> free QNode's data and returns NULL
     - Case NULL -> doesn't free QNode's data and returns the data*/
-void* Q_Pop(Queue *q, void (*freeData)(void *data)){
-  if(Q_IsEmpty(q)) return NULL;
+void* q_pop(Queue *q, void (*freeData)(void *data)){
+  if(q_is_empty(q)) return NULL;
 
   QNode *node = q->front;
   void *d = node->data;
@@ -77,15 +77,15 @@ void* Q_Pop(Queue *q, void (*freeData)(void *data)){
   if(q->front==NULL) q->back = NULL;
   q->size--;
 
-  QN_Free(node, freeData, false);
+  qn_free(node, freeData, false);
 
-  return freeData==NULL ? NULL : d;
+  return freeData ? NULL : d;
 }
 
 /*Prints entire Queue
   printData -> function to print Queue's data
   sep -> Separator between Queue's data */
-void Q_Print(Queue *q, void (*printData)(void *data), char *sep){
+void q_print(Queue *q, void (*printData)(void *data), char *sep){
   if(q==NULL || printData==NULL) return;
   if(q->size==0){
     printf("Empty Queue"); return;

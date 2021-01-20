@@ -1,68 +1,68 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-#include "Stack.h"
+#include "stack.h"
 
-StNode* StN_Create(void *data, StNode *next){
+StNode* stn_new(void *data, StNode *next){
   StNode *node = (StNode*) malloc(sizeof(StNode));
   node->data = data; node->next = next;
   return node;
 }
 
-void StN_Free(StNode *node, void (*freeData)(void *data), bool freeNext){
+void stn_free(StNode *node, void (*freeData)(void *data), bool freeNext){
   if(node==NULL) return;
   
   if(freeData) freeData(node->data);
-  if(freeNext) StN_Free(node->next, freeData, freeNext);
+  if(freeNext) stn_free(node->next, freeData, freeNext);
   free(node);
 }
 
-Stack* St_Create(){
+Stack* st_new(){
   Stack *st = (Stack*) malloc(sizeof(Stack));
   st->top = NULL; st->size = 0;
   return st;
 }
 
-void St_Clear(Stack *st, void (*freeData)(void *data)){
+void st_clear(Stack *st, void (*freeData)(void *data)){
   if(st==NULL) return;
-  StN_Free(st->top, freeData, true);
+  stn_free(st->top, freeData, true);
   st->top = NULL; st->size = 0;
 }
 
-void St_Free(Stack *st, void (*freeData)(void *data)){
+void st_free(Stack *st, void (*freeData)(void *data)){
   if(st==NULL) return;
-  St_Clear(st, freeData);
+  st_clear(st, freeData);
   free(st);
 }
 
-bool St_IsEmpty(Stack *st){
+bool st_is_empty(Stack *st){
   return (st==NULL || st->size==0);
 }
 
-void* St_Top(Stack *st){
-  return St_IsEmpty(st) ? NULL : st->top->data;
+void* st_top(Stack *st){
+  return st_is_empty(st) ? NULL : st->top->data;
 }
 
-void St_Push(Stack *st, void *data){
+void st_push(Stack *st, void *data){
   if(st==NULL) return;
 
-  StNode *node = StN_Create(data, st->top);
+  StNode *node = stn_new(data, st->top);
   st->top = node; st->size++;
 }
 
-void* St_Pop(Stack *st, void (*freeData)(void *data)){
-  if(St_IsEmpty(st)) return NULL;
+void* st_pop(Stack *st, void (*freeData)(void *data)){
+  if(st_is_empty(st)) return NULL;
 
   StNode *node = st->top;
   void *d = node->data;
 
   st->top = node->next; st->size--;
-  StN_Free(node, freeData, false);
+  stn_free(node, freeData, false);
 
-  return freeData==NULL ? NULL : d;
+  return freeData ? NULL : d;
 }
 
-void St_Print(Stack *st, void (*printData)(void *data), char *sep){
+void st_print(Stack *st, void (*printData)(void *data), char *sep){
   if(st==NULL || printData==NULL) return;
   if(st->size==0){
     printf("Empty Stack"); return;
