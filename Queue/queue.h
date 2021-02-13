@@ -36,7 +36,7 @@ void queue_clear(Queue *q, void (*freeData)(void *data));
 void queue_free(Queue *q, void (*freeData)(void *data));
 
 /* Verifies whether the Queue is empty */
-_boolean queue_is_empty(Queue *q);
+_boolean queue_empty(Queue *q);
 
 /* Returns the element on Queue front */
 void* queue_front(Queue *q);

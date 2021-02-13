@@ -34,16 +34,16 @@ void queue_free(Queue *q, void (*freeData)(void *data)){
   free(q);
 }
 
-_boolean queue_is_empty(Queue *q){
+_boolean queue_empty(Queue *q){
   return (q==NULL || q->size==0);
 }
 
 void* queue_front(Queue *q){
-  return queue_is_empty(q) ? NULL : q->front->data;
+  return queue_empty(q) ? NULL : q->front->data;
 }
 
 void* queue_back(Queue *q){
-  return queue_is_empty(q) ? NULL : q->back->data;
+  return queue_empty(q) ? NULL : q->back->data;
 }
 
 void queue_push(Queue *q, void *data){
@@ -53,7 +53,7 @@ void queue_push(Queue *q, void *data){
 
   node = queue_node_new(data, NULL);
 
-  if(queue_is_empty(q))
+  if(queue_empty(q))
     q->front = q->back = node;
   else{
     q->back->next = node;
@@ -67,7 +67,7 @@ void* queue_pop(Queue *q, void (*freeData)(void *data)){
   QueueNode *node;
   void *d;
 
-  if(queue_is_empty(q)) return NULL;
+  if(queue_empty(q)) return NULL;
 
   node = q->front;
   d = node->data;
@@ -85,7 +85,7 @@ void queue_print(Queue *q, void (*printData)(void *data), char *sep){
   QueueNode *node;
 
   if(q==NULL || printData==NULL) return;
-  if(queue_is_empty(q)){
+  if(queue_empty(q)){
     printf("Empty Queue"); return;
   }
   
