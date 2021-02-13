@@ -13,8 +13,8 @@ typedef struct Queue{
   size_t size;
 } Queue;
 
-/* Bool (true/false) definition */
-typedef enum{false=0, true} Bool;
+/* _boolean (true/false) definition */
+typedef enum{false=0, true} _boolean;
 
 /* Creates new QueueNode */
 QueueNode* queue_node_new(void *data, QueueNode *next);
@@ -22,7 +22,7 @@ QueueNode* queue_node_new(void *data, QueueNode *next);
 /* Frees QueueNode.
  * freeData: Function to free data. Case NULL -> doesn't free QueueNode's data
  * delNext: (true/false) -> (frees/doesn't free) the next QueueNode */
-void queue_node_free(QueueNode *node, void (*freeData)(void *data), Bool freeNext);
+void queue_node_free(QueueNode *node, void (*freeData)(void *data), _boolean freeNext);
 
 /* Creates new Queue */
 Queue* queue_new();
@@ -36,7 +36,7 @@ void queue_clear(Queue *q, void (*freeData)(void *data));
 void queue_free(Queue *q, void (*freeData)(void *data));
 
 /* Verifies whether the Queue is empty */
-Bool queue_is_empty(Queue *q);
+_boolean queue_is_empty(Queue *q);
 
 /* Returns the element on Queue front */
 void* queue_front(Queue *q);

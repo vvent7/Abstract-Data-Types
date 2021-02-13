@@ -8,7 +8,7 @@ QueueNode* queue_node_new(void *data, QueueNode *next){
   return node;
 }
 
-void queue_node_free(QueueNode *node, void (*freeData)(void *data), Bool freeNext){
+void queue_node_free(QueueNode *node, void (*freeData)(void *data), _boolean freeNext){
   if(node==NULL) return;
   
   if(freeData) freeData(node->data);
@@ -34,7 +34,7 @@ void queue_free(Queue *q, void (*freeData)(void *data)){
   free(q);
 }
 
-Bool queue_is_empty(Queue *q){
+_boolean queue_is_empty(Queue *q){
   return (q==NULL || q->size==0);
 }
 
