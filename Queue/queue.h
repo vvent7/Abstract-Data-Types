@@ -1,64 +1,61 @@
 #ifndef QUEUE_H
 #define QUEUE_H
 
-#include <stdbool.h>
-
-/*OBS:
-  QN / QNode -> Queue Node
-  Q -> Queue */
-
-//Queue's Nodes definition
-typedef struct QNode{
+/* Queue's Nodes definition */
+typedef struct QueueNode{
   void *data;
-  struct QNode *next;
-} QNode;
+  struct QueueNode *next;
+} QueueNode;
 
-//Queue's definition
-typedef struct{
-  QNode *front, *back;
-  int size;
+/* Queue's definition */
+typedef struct Queue{
+  QueueNode *front, *back;
+  size_t size;
 } Queue;
 
-//Creates new QNode
-QNode* qn_new(void *data, QNode *next);
+/* Bool (true/false) definition */
+typedef enum{false=0, true} Bool;
 
-/* Frees QNode.
-  freeData: Function to free data. Case NULL -> doesn't free QNode's data
-  delNext: (true/false) -> (frees/doesn't free) the next QNode*/
-void qn_free(QNode *node, void (*freeData)(void *data), bool freeNext);
+/* Creates new QueueNode */
+QueueNode* queue_node_new(void *data, QueueNode *next);
 
-//Creates new Queue
-Queue* q_new();
+/* Frees QueueNode.
+ * freeData: Function to free data. Case NULL -> doesn't free QueueNode's data
+ * delNext: (true/false) -> (frees/doesn't free) the next QueueNode */
+void queue_node_free(QueueNode *node, void (*freeData)(void *data), Bool freeNext);
 
-/*Clears entire Queue (remove Queue's QNodes from memory)
-  freeData: Function to free data. Case NULL -> doesn't free QNode's data*/
-void q_clear(Queue *q, void (*freeData)(void *data));
+/* Creates new Queue */
+Queue* queue_new();
 
-/*Frees entire Queue (remove Queue and its QNodes from memory)
-  freeData: Function to free data. Case NULL -> doesn't free QNode's data*/
-void q_free(Queue *q, void (*freeData)(void *data));
+/* Clears entire Queue (remove Queue's QNodes from memory)
+ * freeData: Function to free data. Case NULL -> doesn't free QueueNode's data */
+void queue_clear(Queue *q, void (*freeData)(void *data));
 
-//Verifies whether the Queue is empty
-bool q_is_empty(Queue *q);
+/* Frees entire Queue (remove Queue and its QNodes from memory)
+ * freeData: Function to free data. Case NULL -> doesn't free QueueNode's data */
+void queue_free(Queue *q, void (*freeData)(void *data));
 
-//Returns the element on Queue front
-void* q_front(Queue *q);
+/* Verifies whether the Queue is empty */
+Bool queue_is_empty(Queue *q);
 
-//Returns the element on Queue back
-void* q_back(Queue *q);
+/* Returns the element on Queue front */
+void* queue_front(Queue *q);
 
-//Pushes data in the Queue
-void q_push(Queue *q, void *data);
+/* Returns the element on Queue back */
+void* queue_back(Queue *q);
 
-/*Removes the data on Queue front
-  freeData: Function to free data.
-    - Case not NULL -> free QNode's data and returns NULL
-    - Case NULL -> doesn't free QNode's data and returns the data*/
-void* q_pop(Queue *q, void (*freeData)(void *data));
+/* Pushes data in the Queue */
+void queue_push(Queue *q, void *data);
 
-/*Prints entire Queue
-  printData -> function to print Queue's data
-  sep -> Separator between Queue's data */
-void q_print(Queue *q, void (*printData)(void *data), char *sep);
+/* Removes the data on Queue front
+ * freeData: Function to free data.
+ *   - Case not NULL -> free QueueNode's data and returns NULL
+ *   - Case NULL -> doesn't free QueueNode's data and returns the data */
+void* queue_pop(Queue *q, void (*freeData)(void *data));
+
+/* Prints entire Queue
+ * printData -> function to print Queue's data
+ * sep -> Separator between Queue's data */
+void queue_print(Queue *q, void (*printData)(void *data), char *sep);
 
 #endif
