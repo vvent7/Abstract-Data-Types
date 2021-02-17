@@ -1,76 +1,73 @@
 #ifndef SLIST_H
 #define SLIST_H
 
-#include<stdbool.h>
-
-/*OBS:
-  SN / SlNode -> Singly Node
-  SL / SList -> Singly Linked List */
-
-//SList's Nodes definition
-typedef struct SlNode{
+/* Definition of SinglyList nodes */
+typedef struct SinglyNode{
   void *data;
-  struct SlNode *next;
-} SlNode;
+  struct SinglyNode *next;
+} SinglyNode;
 
-//SList's definition
+/* SinglyList definition */
 typedef struct{
-  SlNode *begin, *end;
-  int size;
-} SList;
+  SinglyNode *begin, *end;
+  size_t size;
+} SinglyList;
 
-//Create new SlNode
-SlNode* sln_new(void *data, SlNode *next);
+/* _boolean (true/false) definition */
+typedef enum{false=0, true} _boolean;
 
-/* Free SlNode.
-  freeData: Function to free data. Case NULL -> doesn't free SlNode's data
-  delNext: true->free next SNodes, false->doesn't free next SNodes */
-void sln_free(SlNode *node, void (*freeData)(void *data), bool freeNext);
+/* Create new SinglyNode */
+SinglyNode* singly_node_new(void *data, SinglyNode *next);
 
-//Create new SList
-SList* sl_new();
+/* Free SinglyNode.
+ * freeData: Function to free data. Case NULL -> doesn't free SinglyNode's data
+ * delNext: true->free next Nodes, false->doesn't free next Nodes */
+void singly_node_free(SinglyNode *node, void (*freeData)(void *data), _boolean freeNext);
 
-/*Clear entire SList (remove SList's SNodes from memory)
-  freeData: Function to free data. Case NULL -> doesn't free SlNode's data*/
-void sl_clear(SList *ls, void (*freeData)(void *data));
+/* Create new SinglyList */
+SinglyList* singly_list_new();
 
-/*Free entire SList (remove SList and its SNodes from memory)
-  freeData: Function to free data. Case NULL -> doesn't free SlNode's data*/
-void sl_free(SList *ls, void (*freeData)(void *data));
+/* Clear entire SinglyList (remove SinglyList Nodes from memory)
+ * freeData: Function to free data. Case NULL -> doesn't free SinglyNode's data */
+void singly_list_clear(SinglyList *ls, void (*freeData)(void *data));
 
-//Verify whether the list is empty
-bool sl_is_empty(SList *ls);
+/* Free entire SinglyList (remove SinglyList and its Nodes from memory)
+ * freeData: Function to free data. Case NULL -> doesn't free SinglyNode's data */
+void singly_list_free(SinglyList *ls, void (*freeData)(void *data));
 
-//Get previous node to a specific index in SList. Complexity: O(index-1)
-SlNode* sl_get_pre_node(SList *ls, int index);
+/* Verify whether the list is empty */
+_boolean singly_list_empty(SinglyList *ls);
 
-//Get SList's data at specific index. Complexity: O(index)
-void* sl_get(SList *ls, int index);
+/* Get previous node to a specific index in SinglyList. Complexity: O(index-1) */
+SinglyNode* singly_list_pre_node(SinglyList *ls, size_t index);
 
-//Insert data at specific SList's index
-bool sl_insert_at(SList *ls, void *data, int index);
+/* Get SinglyList data at specific index. Complexity: O(index) */
+void* singly_list_at(SinglyList *ls, size_t index);
 
-//Insert data at SList's begin
-bool sl_insert_begin(SList *ls, void *data);
+/* Insert data at specific SinglyList index */
+SinglyNode* singly_list_insert(SinglyList *ls, void *data, size_t index);
 
-//Insert data at SList's end
-bool sl_insert_end(SList *ls, void *data);
+/* Insert data at SinglyList begin */
+SinglyNode* singly_list_push_front(SinglyList *ls, void *data);
 
-/*Delete node at specific SList's index
-  freeData: Function to free data. Case NULL -> doesn't free SlNode's data*/
-void* sl_delete_at(SList *ls, int index, void (*freeData)(void *data));
+/* Insert data at SinglyList end */
+SinglyNode* singly_list_push_back(SinglyList *ls, void *data);
 
-/*Delete node at SList's begin
-  freeData: Function to free data. Case NULL -> doesn't free SlNode's data*/
-void* sl_delete_begin(SList *ls, void (*freeData)(void *data));
+/* Delete node at specific SinglyList index
+ * freeData: Function to free data. Case NULL -> doesn't free SinglyNode's data */
+void* singly_list_erase(SinglyList *ls, size_t index, void (*freeData)(void *data));
 
-/*Delete node at SList's end
-  freeData: Function to free data. Case NULL -> doesn't free SlNode's data*/
-void* sl_delete_end(SList *ls, void (*freeData)(void *data));
+/* Delete node at SinglyList begin
+ * freeData: Function to free data. Case NULL -> doesn't free SinglyNode's data */
+void* singly_list_pop_front(SinglyList *ls, void (*freeData)(void *data));
 
-/*Print entire SList
-  printData -> function to print SList's data
-  sep -> Separator between SList's data */
-void sl_print(SList *ls, void (*printData)(void *data), char *sep);
+/* Delete node at SinglyList end
+ * freeData: Function to free data. Case NULL -> doesn't free SinglyNode's data */
+void* singly_list_pop_back(SinglyList *ls, void (*freeData)(void *data));
+
+/* Print entire SinglyList
+ * printData -> function to print SinglyList data
+ * sep -> Separator between SinglyList data */
+void singly_list_print(SinglyList *ls, void (*printData)(void *data), char *sep);
 
 #endif

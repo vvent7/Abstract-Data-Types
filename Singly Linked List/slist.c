@@ -1,92 +1,94 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdbool.h>
 #include "slist.h"
 
-SlNode* sln_new(void *data, SlNode *next){
-  SlNode *node = (SlNode*) malloc(sizeof(SlNode));
+SinglyNode* singly_node_new(void *data, SinglyNode *next){
+  SinglyNode *node = (SinglyNode*) malloc(sizeof(SinglyNode));
   node->data = data; node->next = next;
   return node;
 }
 
-void sln_free(SlNode *node, void (*freeData)(void *data), bool freeNext){
+void singly_node_free(SinglyNode *node, void (*freeData)(void *data), _boolean freeNext){
   if(node==NULL) return;
   
   if(freeData) freeData(node->data);
-  if(freeNext) sln_free(node->next, freeData, freeNext);
+  if(freeNext) singly_node_free(node->next, freeData, freeNext);
   free(node);
 }
 
-SList* sl_new(){
-  SList *ls = (SList*) malloc(sizeof(SList));
+SinglyList* singly_list_new(){
+  SinglyList *ls = (SinglyList*) malloc(sizeof(SinglyList));
   ls->begin = ls->end=NULL; ls->size=0;
   return ls;
 }
 
-void sl_clear(SList *ls, void (*freeData)(void *data)){
+void singly_list_clear(SinglyList *ls, void (*freeData)(void *data)){
   if(ls==NULL) return;
-  sln_free(ls->begin, freeData, true);
+  singly_node_free(ls->begin, freeData, true);
   ls->begin = ls->end = NULL; ls->size = 0;
 }
 
-void sl_free(SList *ls, void (*freeData)(void *data)){
+void singly_list_free(SinglyList *ls, void (*freeData)(void *data)){
   if(ls==NULL) return;
-  sl_clear(ls, freeData);
+  singly_list_clear(ls, freeData);
   free(ls);
 }
 
-bool sl_is_empty(SList *ls){
+_boolean singly_list_empty(SinglyList *ls){
   return (ls==NULL || ls->size==0);
 }
 
-SlNode* sl_get_pre_node(SList *ls, int index){
-  if(ls==NULL || index<=0 || index>ls->size) return NULL;
+SinglyNode* singly_list_pre_node(SinglyList *ls, size_t index){
+  SinglyNode *aux;
+  
+  if(ls==NULL || index==0 || index>ls->size) return NULL;
 
-  SlNode *aux = ls->begin;
+  aux = ls->begin;
   while(--index>0) aux = aux->next;
   return aux;
 }
 
-void* sl_get(SList *ls, int index){
-  if(ls==NULL || index<0 || index>=ls->size) return NULL;
+void* singly_list_at(SinglyList *ls, size_t index){
+  if(ls==NULL || index>=ls->size) return NULL;
 
-  return sl_get_pre_node(ls, index+1)->data;
+  return singly_list_pre_node(ls, index+1)->data;
 }
 
-bool sl_insert_at(SList *ls, void *data, int index){
-  if(ls==NULL || index<0 || index>ls->size) return false;
+SinglyNode* singly_list_insert(SinglyList *ls, void *data, size_t index){
+  SinglyNode *node, *aux;
 
-  SlNode *node;
+  if(ls==NULL || index>ls->size) return NULL;
 
   if(index==0){
-    node = sln_new(data, ls->begin);
+    node = singly_node_new(data, ls->begin);
     ls->begin = node;
-    if(sl_is_empty(ls)) ls->end = node;
+    if(singly_list_empty(ls)) ls->end = node;
   }
   else{
-    SlNode *aux = sl_get_pre_node(ls, index);
-    node = sln_new(data, aux->next);
+    aux = singly_list_pre_node(ls, index);
+    node = singly_node_new(data, aux->next);
     aux->next = node;
     if(aux==ls->end) ls->end = node;
   }
 
   ls->size++;
 
-  return true;
+  return node;
 }
 
-bool sl_insert_begin(SList *ls, void *data){
-  return ls==NULL ? false : sl_insert_at(ls, data, 0);
+SinglyNode* singly_list_push_front(SinglyList *ls, void *data){
+  return ls==NULL ? false : singly_list_insert(ls, data, 0);
 }
 
-bool sl_insert_end(SList *ls, void *data){
-  return ls==NULL ? false : sl_insert_at(ls, data, ls->size);
+SinglyNode* singly_list_push_back(SinglyList *ls, void *data){
+  return ls==NULL ? false : singly_list_insert(ls, data, ls->size);
 }
 
-void* sl_delete_at(SList *ls, int index, void (*freeData)(void *data)){
-  if(sl_is_empty(ls) || index<0 || index>=ls->size) return NULL;
+void* singly_list_erase(SinglyList *ls, size_t index, void (*freeData)(void *data)){
+  SinglyNode *node, *aux;
+  void *d;
 
-  SlNode *node;
+  if(singly_list_empty(ls) || index>=ls->size) return NULL;
   
   if(index==0){
     node = ls->begin;
@@ -94,7 +96,7 @@ void* sl_delete_at(SList *ls, int index, void (*freeData)(void *data)){
     if(ls->size==1) ls->end = NULL;
   }
   else{
-    SlNode *aux = sl_get_pre_node(ls, index);
+    aux = singly_list_pre_node(ls, index);
 
     node = aux->next;
     aux->next = node->next;
@@ -102,28 +104,29 @@ void* sl_delete_at(SList *ls, int index, void (*freeData)(void *data)){
     if(node==ls->end) ls->end = aux;
   }
 
-  void *d = node->data;
-  sln_free(node, freeData, false);
+  d = node->data;
+  singly_node_free(node, freeData, false);
   ls->size--;
 
   return freeData ? NULL : d;
 }
 
-void* sl_delete_begin(SList *ls, void (*freeData)(void *data)){
-  return sl_is_empty(ls) ? NULL : sl_delete_at(ls, 0, freeData);
+void* singly_list_pop_front(SinglyList *ls, void (*freeData)(void *data)){
+  return singly_list_empty(ls) ? NULL : singly_list_erase(ls, 0, freeData);
 }
 
-void* sl_delete_end(SList *ls, void (*freeData)(void *data)){
-  return sl_is_empty(ls) ? NULL : sl_delete_at(ls, ls->size-1, freeData);
+void* singly_list_pop_back(SinglyList *ls, void (*freeData)(void *data)){
+  return singly_list_empty(ls) ? NULL : singly_list_erase(ls, ls->size-1, freeData);
 }
 
-void sl_print(SList *ls, void (*printData)(void *data), char *sep){
+void singly_list_print(SinglyList *ls, void (*printData)(void *data), char *sep){
+  SinglyNode *node;
+
   if(ls==NULL || printData==NULL) return;
-  if(sl_is_empty(ls)){
+  if(singly_list_empty(ls)){
     printf("Empty List"); return;
   }
-
-  SlNode *node;
+  
   for(node = ls->begin;node!=NULL;node=node->next){
     if(node!=ls->begin) printf("%s", sep);
     printData(node->data);
