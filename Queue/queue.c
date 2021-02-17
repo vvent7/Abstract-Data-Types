@@ -36,16 +36,14 @@ Queue* queue_new(){
 }
 
 void _queue_clear(Queue *q, void (*freeData)(void *data)){
-  QueueNode *frontNd;
   if(q==NULL) return;
-  frontNd = q->frontNd;
-  frontNd->free(frontNd, freeData, 1);
+  _queue_node_free(q->frontNd, freeData, 1);
   q->frontNd = q->backNd = NULL; q->size = 0;
 }
 
 void _queue_free(Queue *q, void (*freeData)(void *data)){
   if(q==NULL) return;
-  q->clear(q, freeData);
+  _queue_clear(q, freeData);
   free(q);
 }
 
@@ -54,11 +52,11 @@ unsigned short _queue_empty(Queue *q){
 }
 
 void* _queue_front(Queue *q){
-  return q->empty(q) ? NULL : q->frontNd->data;
+  return _queue_empty(q) ? NULL : q->frontNd->data;
 }
 
 void* _queue_back(Queue *q){
-  return q->empty(q) ? NULL : q->backNd->data;
+  return _queue_empty(q) ? NULL : q->backNd->data;
 }
 
 void _queue_push(Queue *q, void *data){
@@ -68,7 +66,7 @@ void _queue_push(Queue *q, void *data){
 
   node = queue_node_new(data, NULL);
 
-  if(q->empty(q))
+  if(_queue_empty(q))
     q->frontNd = q->backNd = node;
   else{
     q->backNd->next = node;
@@ -82,7 +80,7 @@ void* _queue_pop(Queue *q, void (*freeData)(void *data)){
   QueueNode *node;
   void *d;
 
-  if(q->empty(q)) return NULL;
+  if(_queue_empty(q)) return NULL;
 
   node = q->frontNd;
   d = node->data;
@@ -91,7 +89,7 @@ void* _queue_pop(Queue *q, void (*freeData)(void *data)){
   if(q->frontNd==NULL) q->backNd = NULL;
   q->size--;
 
-  node->free(node, freeData, 0);
+  _queue_node_free(node, freeData, 0);
 
   return freeData ? NULL : d;
 }
@@ -100,7 +98,7 @@ void _queue_print(Queue *q, void (*printData)(void *data), char *sep){
   QueueNode *node;
 
   if(q==NULL || printData==NULL) return;
-  if(q->empty(q)){
+  if(_queue_empty(q)){
     printf("Empty Queue"); return;
   }
   

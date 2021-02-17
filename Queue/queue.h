@@ -11,8 +11,8 @@ typedef struct QueueNode{
 
 /* Queue definition */
 typedef struct Queue{
-  QueueNode *frontNd, *backNd;
   size_t size;
+  QueueNode *frontNd, *backNd;
 
   void (*clear)(struct Queue *this, void (*freeData)(void *data));
   void (*free)(struct Queue *this, void (*freeData)(void *data));
@@ -24,23 +24,23 @@ typedef struct Queue{
   void (*print)(struct Queue *this, void (*printData)(void *data), char *sep);
 } Queue;
 
+/* OBS: for all functions with 'freeData' function:
+ * freeData: Function to free data. Case NULL -> doesn't free SinglyNode data */
+
 /* Creates new QueueNode */
 QueueNode* queue_node_new(void *data, QueueNode *next);
 
 /* Frees QueueNode.
- * freeData: Function to free data. Case NULL -> doesn't free QueueNode's data
  * freeNext: (true(1)/false(0)) -> (frees/doesn't free) the next QueueNode */
 void _queue_node_free(QueueNode *node, void (*freeData)(void *data), unsigned short freeNext);
 
 /* Creates new Queue */
 Queue* queue_new();
 
-/* Clears entire Queue (remove Queue's QNodes from memory)
- * freeData: Function to free data. Case NULL -> doesn't free QueueNode's data */
+/* Clears entire Queue (remove QueueNodes from memory) */
 void _queue_clear(Queue *q, void (*freeData)(void *data));
 
-/* Frees entire Queue (remove Queue and its QNodes from memory)
- * freeData: Function to free data. Case NULL -> doesn't free QueueNode's data */
+/* Frees entire Queue (remove Queue and its Nodes from memory) */
 void _queue_free(Queue *q, void (*freeData)(void *data));
 
 /* Verifies whether the Queue is empty */
@@ -57,13 +57,13 @@ void _queue_push(Queue *q, void *data);
 
 /* Removes the data on Queue front
  * freeData: Function to free data.
- *   - Case not NULL -> free QueueNode's data and returns NULL
- *   - Case NULL -> doesn't free QueueNode's data and returns the data */
+ *   - Case not NULL -> frees QueueNode data and returns NULL
+ *   - Case NULL -> doesn't free QueueNode data and returns the data */
 void* _queue_pop(Queue *q, void (*freeData)(void *data));
 
 /* Prints entire Queue
- * printData -> function to print Queue's data
- * sep -> Separator between Queue's data */
+ * printData -> function to print Queue data
+ * sep -> Separator between Queue data */
 void _queue_print(Queue *q, void (*printData)(void *data), char *sep);
 
 #endif

@@ -2,73 +2,109 @@
 #include <stdlib.h>
 #include "slist.h"
 
-SinglyNode* singly_node_new(void *data, SinglyNode *next){
+SinglyNode* snode_new(void *data, SinglyNode *next){
   SinglyNode *node = (SinglyNode*) malloc(sizeof(SinglyNode));
-  node->data = data; node->next = next;
+  node->data = data; node->next = next; node->free = _snode_free;
   return node;
 }
 
-void singly_node_free(SinglyNode *node, void (*freeData)(void *data), _boolean freeNext){
+void _snode_free(SinglyNode *node, void (*freeData)(void *data), unsigned short freeNext){
+  SinglyNode *nextNd;
+
   if(node==NULL) return;
-  
-  if(freeData) freeData(node->data);
-  if(freeNext) singly_node_free(node->next, freeData, freeNext);
-  free(node);
+
+  do{
+    if(freeData) freeData(node->data);
+    nextNd = node->next; free(node); node = nextNd;
+  }while(node && freeNext); 
 }
 
-SinglyList* singly_list_new(){
+SinglyList* slist_new(){
   SinglyList *ls = (SinglyList*) malloc(sizeof(SinglyList));
-  ls->begin = ls->end=NULL; ls->size=0;
+  ls->first = ls->last=NULL; ls->size=0;
+
+  ls->empty = _slist_empty;
+  ls->front = _slist_front;
+  ls->back = _slist_back;
+  ls->push_front = _slist_push_front;
+  ls->pop_front = _slist_pop_front;
+  ls->push_back = _slist_push_back;
+  ls->pop_back = _slist_pop_back;
+  ls->pre_node = _slist_pre_node;
+  ls->at = _slist_at;
+  ls->get_data = _slist_get_data;
+  ls->insert = _slist_insert;
+  ls->erase = _slist_erase;
+  ls->erase_n = _slist_erase_n;
+  ls->clear = _slist_clear;
+  ls->free = _slist_free;
+  ls->print = _slist_print;
+
   return ls;
 }
 
-void singly_list_clear(SinglyList *ls, void (*freeData)(void *data)){
-  if(ls==NULL) return;
-  singly_node_free(ls->begin, freeData, true);
-  ls->begin = ls->end = NULL; ls->size = 0;
-}
-
-void singly_list_free(SinglyList *ls, void (*freeData)(void *data)){
-  if(ls==NULL) return;
-  singly_list_clear(ls, freeData);
-  free(ls);
-}
-
-_boolean singly_list_empty(SinglyList *ls){
+unsigned short _slist_empty(SinglyList *ls){
   return (ls==NULL || ls->size==0);
 }
 
-SinglyNode* singly_list_pre_node(SinglyList *ls, size_t index){
+void* _slist_front(SinglyList *ls){
+  return _slist_empty(ls) ? NULL : ls->first->data;
+}
+
+void* _slist_back(SinglyList *ls){
+  return _slist_empty(ls) ? NULL : ls->last->data;
+}
+
+SinglyNode* _slist_push_front(SinglyList *ls, void *data){
+  return ls==NULL ? NULL : _slist_insert(ls, data, 0);
+}
+
+void _slist_pop_front(SinglyList *ls, void (*freeData)(void *data)){
+  if(!_slist_empty(ls)) _slist_erase(ls, 0, freeData);
+}
+
+SinglyNode* _slist_push_back(SinglyList *ls, void *data){
+  return ls==NULL ? NULL : _slist_insert(ls, data, ls->size);
+}
+
+void _slist_pop_back(SinglyList *ls, void (*freeData)(void *data)){
+  if(!_slist_empty(ls)) _slist_erase(ls, ls->size-1, freeData);
+}
+
+SinglyNode* _slist_pre_node(SinglyList *ls, size_t index){
   SinglyNode *aux;
   
   if(ls==NULL || index==0 || index>ls->size) return NULL;
 
-  aux = ls->begin;
+  aux = ls->first;
   while(--index>0) aux = aux->next;
   return aux;
 }
 
-void* singly_list_at(SinglyList *ls, size_t index){
-  if(ls==NULL || index>=ls->size) return NULL;
-
-  return singly_list_pre_node(ls, index+1)->data;
+SinglyNode* _slist_at(SinglyList *ls, size_t index){
+  return _slist_pre_node(ls, index+1);
 }
 
-SinglyNode* singly_list_insert(SinglyList *ls, void *data, size_t index){
+void* _slist_get_data(SinglyList *ls, size_t index){
+  SinglyNode *sn = ls->at(ls, index);
+  return sn ? sn->data : NULL;
+}
+
+SinglyNode* _slist_insert(SinglyList *ls, void *data, size_t index){
   SinglyNode *node, *aux;
 
   if(ls==NULL || index>ls->size) return NULL;
 
   if(index==0){
-    node = singly_node_new(data, ls->begin);
-    ls->begin = node;
-    if(singly_list_empty(ls)) ls->end = node;
+    node = snode_new(data, ls->first);
+    ls->first = node;
+    if(_slist_empty(ls)) ls->last = node;
   }
   else{
-    aux = singly_list_pre_node(ls, index);
-    node = singly_node_new(data, aux->next);
+    aux = _slist_pre_node(ls, index);
+    node = snode_new(data, aux->next);
     aux->next = node;
-    if(aux==ls->end) ls->end = node;
+    if(aux==ls->last) ls->last = node;
   }
 
   ls->size++;
@@ -76,59 +112,59 @@ SinglyNode* singly_list_insert(SinglyList *ls, void *data, size_t index){
   return node;
 }
 
-SinglyNode* singly_list_push_front(SinglyList *ls, void *data){
-  return ls==NULL ? false : singly_list_insert(ls, data, 0);
-}
+SinglyNode* _slist_erase_n(struct SinglyList *ls, size_t index, size_t n, void (*freeData)(void *data)){
+  SinglyNode *preNd, *node, *nextNd;
+  size_t i;
 
-SinglyNode* singly_list_push_back(SinglyList *ls, void *data){
-  return ls==NULL ? false : singly_list_insert(ls, data, ls->size);
-}
+  if(_slist_empty(ls) || index>=ls->size) return NULL;
 
-void* singly_list_erase(SinglyList *ls, size_t index, void (*freeData)(void *data)){
-  SinglyNode *node, *aux;
-  void *d;
+  n = MIN(ls->size-index, n);
 
-  if(singly_list_empty(ls) || index>=ls->size) return NULL;
-  
-  if(index==0){
-    node = ls->begin;
-    ls->begin = ls->begin->next;
-    if(ls->size==1) ls->end = NULL;
-  }
-  else{
-    aux = singly_list_pre_node(ls, index);
+  preNd = _slist_pre_node(ls, index);
+  node = preNd ? preNd->next : ls->first;
 
-    node = aux->next;
-    aux->next = node->next;
-
-    if(node==ls->end) ls->end = aux;
+  for(i=0;i<n;i++){
+    if(freeData) freeData(node->data);
+    nextNd = node->next; free(node); node = nextNd;
   }
 
-  d = node->data;
-  singly_node_free(node, freeData, false);
-  ls->size--;
+  if(preNd){
+    if((preNd->next = node)==NULL)
+      ls->last = preNd;
+  }
+  else if((ls->first = node)==NULL) ls->last = NULL;
 
-  return freeData ? NULL : d;
+  ls->size-=n;
+
+  return node;
 }
 
-void* singly_list_pop_front(SinglyList *ls, void (*freeData)(void *data)){
-  return singly_list_empty(ls) ? NULL : singly_list_erase(ls, 0, freeData);
+SinglyNode* _slist_erase(SinglyList *ls, size_t index, void (*freeData)(void *data)){
+  return _slist_erase_n(ls, index, 1, freeData);
 }
 
-void* singly_list_pop_back(SinglyList *ls, void (*freeData)(void *data)){
-  return singly_list_empty(ls) ? NULL : singly_list_erase(ls, ls->size-1, freeData);
+void _slist_clear(SinglyList *ls, void (*freeData)(void *data)){
+  if(ls==NULL) return;
+  _snode_free(ls->first, freeData, 1);
+  ls->first = ls->last = NULL; ls->size = 0;
 }
 
-void singly_list_print(SinglyList *ls, void (*printData)(void *data), char *sep){
+void _slist_free(SinglyList *ls, void (*freeData)(void *data)){
+  if(ls==NULL) return;
+  _slist_clear(ls, freeData);
+  free(ls);
+}
+
+void _slist_print(SinglyList *ls, void (*printData)(void *data), char *sep){
   SinglyNode *node;
 
   if(ls==NULL || printData==NULL) return;
-  if(singly_list_empty(ls)){
+  if(_slist_empty(ls)){
     printf("Empty List"); return;
   }
   
-  for(node = ls->begin;node!=NULL;node=node->next){
-    if(node!=ls->begin) printf("%s", sep);
+  for(node = ls->first;node!=NULL;node=node->next){
+    if(node!=ls->first) printf("%s", sep);
     printData(node->data);
   }
 }

@@ -3,11 +3,12 @@
 #include <stdlib.h>
 #include "queue.h"
 
-#define TAM 10
+#define TAM 15
 #define LIM 101
 
 void printData(void *x){
-  printf("%d", *((int*)x));
+  if(x==NULL) printf("NULL");
+  else printf("%d", *((int*)x));
 }
 
 void freeData(void *x){
@@ -40,7 +41,7 @@ int main(){
   printf("\n"); q->print(q, printData, " ");
 
   printf("\n\nRemove erasing from memory:\n");
-  for(i=0;i<half;i++){
+  for(i=half;i<TAM;i++){
     if((aux = q->pop(q, freeData))!=NULL) printf("Pop return: %d\n", *aux);
     else printf("Pop didn't return anything.\n");
   }
