@@ -13,8 +13,11 @@ typedef struct{
   size_t size;
 } SinglyList;
 
-/* _boolean (true/false) definition */
-typedef enum{false=0, true} _boolean;
+#ifndef _BOOLEAN
+#define _BOOLEAN
+  /* _boolean (true/false) definition */
+  typedef enum{false=0, true} _boolean;
+#endif
 
 /* Create new SinglyNode */
 SinglyNode* singly_node_new(void *data, SinglyNode *next);

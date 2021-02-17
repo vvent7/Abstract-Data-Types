@@ -13,8 +13,11 @@ typedef struct Queue{
   size_t size;
 } Queue;
 
+#ifndef _BOOLEAN
+#define _BOOLEAN
 /* _boolean (true/false) definition */
 typedef enum{false=0, true} _boolean;
+#endif
 
 /* Creates new QueueNode */
 QueueNode* queue_node_new(void *data, QueueNode *next);
