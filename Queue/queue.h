@@ -5,6 +5,7 @@
 typedef struct QueueNode{
   void *data;
   struct QueueNode *next;
+  
   void (*free)(struct QueueNode *this, void (*freeData)(void *data), unsigned short freeNext);
 } QueueNode;
 
